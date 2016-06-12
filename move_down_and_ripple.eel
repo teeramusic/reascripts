@@ -1,0 +1,67 @@
+selected.len=CountSelectedMediaItems(0);
+
+selected.len ? (
+selected=GetSelectedMediaItem(0,0);
+selected.last=GetSelectedMediaItem(0,selected.len-1);
+selected.first.pos=GetMediaItemInfo_Value(selected,"D_POSITION");
+selected.last.pos=GetMediaItemInfo_Value(selected.last,"D_POSITION");
+
+selected.first.itemnumber=GetMediaItemInfo_Value(selected,"IP_ITEMNUMBER")+1;
+selected.last.itemnumber=GetMediaItemInfo_Value(selected.last,"IP_ITEMNUMBER")+1;
+selected.check=(selected.last.itemnumber-selected.first.itemnumber) + 1;
+
+selected.track=GetMediaItemTrack(selected);
+
+//check for single track
+singletrack=1;
+loop(selected.len,
+  selected.track!=GetMediaItemTrack(GetSelectedMediaItem(0,i)) ? (
+    singletrack=0;
+  );
+  i=i+1;
+);
+
+
+
+((selected.check)==selected.len) ? ( //check for selection gap
+singletrack ? (
+
+
+selected.track=GetMediaItemTrack(selected);
+selected.track.item.len=CountTrackMediaItems(selected.track);
+
+selected.track.idx=GetMediaTrackInfo_Value(selected.track,"IP_TRACKNUMBER");
+selected.track.next=GetTrack(0,selected.track.idx);
+
+
+
+!selected.track.next ? (  //add new track if no next track
+InsertTrackAtIndex(selected.track.idx,true);
+
+selected.track.next=GetTrack(0,selected.track.idx);
+TrackList_AdjustWindows(false); //update ui
+);
+
+selected.next=GetTrackMediaItem(selected.track,selected.last.itemnumber);
+selected.next.pos=GetMediaItemInfo_Value(selected.next,"D_POSITION");
+offset=selected.next.pos-selected.first.pos;
+
+//move items left
+loop(selected.track.item.len-selected.last.itemnumber,
+next_items=GetTrackMediaItem(selected.track,selected.last.itemnumber);
+next_items.pos=GetMediaItemInfo_Value(next_items,"D_POSITION");
+selected.last.itemnumber=selected.last.itemnumber+1;
+SetMediaItemPosition(next_items, next_items.pos-offset,false);
+);
+
+selected.last.itemnumber=GetMediaItemInfo_Value(selected.last,"IP_ITEMNUMBER")+1;
+
+//move items down
+loop(selected.len,
+selected=GetSelectedMediaItem(0,0);
+MoveMediaItemToTrack(selected,selected.track.next);
+);
+UpdateArrange();
+);
+);
+);

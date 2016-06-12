@@ -1,0 +1,30 @@
+//SetTakeStretchMarker(MediaItem_Take take, int idx, pos, optional srcposInOptional)
+//GetTakeStretchMarker(MediaItem_Take take, int idx, &posOut, optional &srcposOutOptional)
+//GetTakeNumStretchMarkers(MediaItem_Take* take)
+//GetMediaItemTake(MediaItem item, int tk)
+
+//set amt to change random +/- amount in ms.
+amt=20;
+//set movefirst to 1 to also move the first marker, default 0
+movefirst=0;
+
+count=CountSelectedMediaItems(0);
+take=count;
+loop(count,
+  sel[i]=GetSelectedMediaItem(0,i);
+  take[i]=GetActiveTake(sel[i]);
+  sm_count=GetTakeNumStretchMarkers(take[i]);
+  sm_count>1 ?(
+    loop(sm_count,
+    GetTakeStretchMarker(take[i], ii, posOut,srcposOutOptional);
+    movefirst || ii > 0  ? (
+      SetTakeStretchMarker(take[i], ii, posOut+(rand()-rand())*(amt/1000));
+    );
+    ii=ii+1;
+    );
+  );
+  ii=0;
+  i=i+1;
+);
+i=0;
+UpdateArrange();  

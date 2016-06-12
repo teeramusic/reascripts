@@ -1,0 +1,41 @@
+item_count=CountSelectedMediaItems(0);
+item_count>1 ? (
+  twotrack=1;
+  track_a=GetMediaItemTrack(GetSelectedMediaItem(0,0));
+  track_b=0;
+  while (item_count>i && twotrack)(
+    item=GetSelectedMediaItem(0,i);
+    track=GetMediaItemTrack(item);
+      !track_b && (track!=track_a) ? (
+         track_b=track;
+      ):(
+        track_b && track!=track_b && track!=track_a ? (
+            twotrack=0;
+        );
+      ); 
+    i=i+1;
+    item_count==i && track==track_a ?(
+      twotrack=0;
+    ); 
+  );
+i=0;
+  twotrack ?(
+    loop(item_count,
+    x[i]=GetSelectedMediaItem(0,i);
+    i=i+1;
+    );
+i=0;   
+   loop(item_count,
+         track=GetMediaItemTrack(x[i]);
+         track == track_a ? (
+           MoveMediaItemToTrack(x[i],track_b);
+         ):(
+           MoveMediaItemToTrack(x[i],track_a);   
+         );
+         i=i+1;
+       );
+    UpdateArrange();
+    UpdateTimeline();
+  );
+);
+
